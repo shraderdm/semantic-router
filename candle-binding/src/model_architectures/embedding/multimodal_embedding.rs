@@ -22,6 +22,7 @@
 
 use crate::core::{config_errors, from_candle_error, UnifiedError, UnifiedResult};
 use crate::model_architectures::embedding::pooling::mean_pool;
+use crate::model_architectures::embedding::siglip2_vision::Siglip2VisionEncoder;
 use crate::model_architectures::traits::{
     EmbeddingPathSpecialization, LongContextEmbeddingCapable, ModelType, PoolingMethod,
 };
@@ -29,6 +30,27 @@ use crate::model_architectures::unified_interface::CoreModel;
 use candle_core::{DType, Device, Module, Tensor, D};
 use candle_nn::{embedding, layer_norm, linear, Embedding, LayerNorm, Linear, VarBuilder};
 use std::path::Path;
+
+/// Selects which SigLIP vision encoder variant to load.
+///
+/// V1 = hand-rolled SigLIP-base-patch16 (mean-pool, optional linear head),
+/// matches the existing `multi-modal-embed-small` checkpoint.
+///
+/// V2 = SigLIP2 attentional-probe head, fixed resolution. Used by the v0.1
+/// CUA-routing demo against a SigLIP2-base-patch16-{256,512} checkpoint.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VisionVariant {
+    V1,
+    V2,
+}
+
+impl Default for VisionVariant {
+    fn default() -> Self {
+        // Preserve existing behavior: any checkpoint that does NOT specify
+        // `"vision_variant": "v2"` in config.json loads the v1 encoder.
+        VisionVariant::V1
+    }
+}
 
 // ============================================================================
 // Configuration
@@ -58,6 +80,9 @@ pub struct MultiModalEmbeddingConfig {
     pub audio_num_mel_bins: usize,
     pub audio_max_source_positions: usize,
     pub matryoshka_dims: Vec<usize>,
+    /// Selects between SigLIP v1 (hand-rolled mean-pool) and SigLIP v2 (attentional probe).
+    /// Defaults to V1 to preserve behavior for existing checkpoints.
+    pub vision_variant: VisionVariant,
 }
 
 impl Default for MultiModalEmbeddingConfig {
@@ -87,6 +112,7 @@ impl Default for MultiModalEmbeddingConfig {
             audio_num_mel_bins: 80,
             audio_max_source_positions: 1500,
             matryoshka_dims: vec![384, 256, 128, 64, 32],
+            vision_variant: VisionVariant::V1,
         }
     }
 }
@@ -123,6 +149,23 @@ impl MultiModalEmbeddingConfig {
                 .iter()
                 .filter_map(|d| d.as_u64().map(|x| x as usize))
                 .collect();
+        }
+        // Vision variant selection. Accepted values: "v1" (default), "v2".
+        // The v2 variant requires a SigLIP2-shaped checkpoint with attentional
+        // probe weights at `image_encoder.vision_encoder.head.{probe,attention,...}`.
+        if let Some(variant_str) = v["vision_variant"].as_str() {
+            cfg.vision_variant = match variant_str.to_ascii_lowercase().as_str() {
+                "v1" | "siglip" | "siglip1" => VisionVariant::V1,
+                "v2" | "siglip2" => VisionVariant::V2,
+                other => {
+                    return Err(config_errors::invalid_json(
+                        &config_path.display().to_string(),
+                        &format!(
+                            "unknown `vision_variant`: {other:?} (expected \"v1\" or \"v2\")"
+                        ),
+                    ))
+                }
+            };
         }
         Ok(cfg)
     }
@@ -826,9 +869,26 @@ impl WhisperEncoder {
 // ============================================================================
 
 /// Multi-modal embedding model combining text, image, and audio encoders.
+/// Vision encoder slot. Holds either the v1 hand-rolled SigLIP encoder OR the
+/// v2 attentional-probe encoder, dispatched by `MultiModalEmbeddingConfig.vision_variant`.
+#[derive(Clone)]
+enum VisionEncoderImpl {
+    V1(SigLIPVisionEncoder),
+    V2(Siglip2VisionEncoder),
+}
+
+impl VisionEncoderImpl {
+    fn forward(&self, pixel_values: &Tensor) -> candle_core::Result<Tensor> {
+        match self {
+            VisionEncoderImpl::V1(e) => e.forward(pixel_values),
+            VisionEncoderImpl::V2(e) => e.forward(pixel_values),
+        }
+    }
+}
+
 pub struct MultiModalEmbeddingModel {
     text_encoder: MiniLMEncoder,
-    image_encoder: SigLIPVisionEncoder,
+    image_encoder: VisionEncoderImpl,
     image_projection: Linear,
     audio_encoder: Option<WhisperEncoder>,
     config: MultiModalEmbeddingConfig,
@@ -879,9 +939,21 @@ impl MultiModalEmbeddingModel {
             .map_err(|e| from_candle_error(e, "failed to load MiniLM text encoder", None))?;
 
         // Image encoder: weights under image_encoder.vision_encoder.*
-        let image_encoder =
-            SigLIPVisionEncoder::load(vb.pp("image_encoder.vision_encoder"), config)
-                .map_err(|e| from_candle_error(e, "failed to load SigLIP image encoder", None))?;
+        // Variant dispatch: v1 (existing hand-rolled SigLIP) or v2 (attentional probe).
+        let image_encoder = match config.vision_variant {
+            VisionVariant::V1 => VisionEncoderImpl::V1(
+                SigLIPVisionEncoder::load(vb.pp("image_encoder.vision_encoder"), config)
+                    .map_err(|e| {
+                        from_candle_error(e, "failed to load SigLIP v1 image encoder", None)
+                    })?,
+            ),
+            VisionVariant::V2 => VisionEncoderImpl::V2(
+                Siglip2VisionEncoder::load(vb.pp("image_encoder.vision_encoder"), config)
+                    .map_err(|e| {
+                        from_candle_error(e, "failed to load SigLIP v2 image encoder", None)
+                    })?,
+            ),
+        };
 
         // Image projection: 768 → 384
         let image_projection = linear(

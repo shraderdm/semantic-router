@@ -51,6 +51,11 @@ pub mod mmbert_embedding;
 // Multi-modal embedding model (text + image + audio, 384-dim)
 pub mod multimodal_embedding;
 
+// SigLIP2 fixed-resolution vision encoder (V2 alternative for multimodal_embedding).
+// Sibling module so the v1 hand-rolled encoder in multimodal_embedding.rs stays intact
+// for existing `multi-modal-embed-small` consumers.
+pub mod siglip2_vision;
+
 // Re-exports for convenience
 pub use dense_layers::{BottleneckDenseNet, DenseActivation, DenseLayer};
 pub use gemma3_model::{

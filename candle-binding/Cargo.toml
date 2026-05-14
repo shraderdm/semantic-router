@@ -28,13 +28,19 @@ accelerate = ["candle-core/accelerate", "candle-nn/accelerate", "candle-transfor
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-candle-core = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
-candle-nn = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
-candle-transformers = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
-# Flash Attention 2 (optional, requires CUDA)
-# Reference: https://github.com/huggingface/candle/tree/main/candle-flash-attn
-# Using git dependency to automatically fetch CUTLASS submodule
-candle-flash-attn = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1", optional = true }
+# DEMO DEPS: pinned to shraderdm/candle's cua-demo-merged branch which carries
+# both wip/siglip2-port (PR #3510 - SigLIP2 NaFlex port, cosine 0.9996 vs PyTorch
+# reference) and wip/candle-core-antialias (PR #3512 - antialias kernel) merged.
+# These will move back to the upstream tag once those candle PRs land.
+#
+# UPSTREAM-BOUND (FOR WHEN CANDLE PRs MERGE):
+# candle-core = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
+# candle-nn = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
+# candle-transformers = { version = "0.9.2-alpha.1", git = "https://github.com/huggingface/candle", tag = "0.9.2-alpha.1" }
+candle-core = { git = "https://github.com/shraderdm/candle.git", rev = "bf35cbadc15b2c7a63edb77534c46b1799a3493e" }
+candle-nn = { git = "https://github.com/shraderdm/candle.git", rev = "bf35cbadc15b2c7a63edb77534c46b1799a3493e" }
+candle-transformers = { git = "https://github.com/shraderdm/candle.git", rev = "bf35cbadc15b2c7a63edb77534c46b1799a3493e" }
+candle-flash-attn = { git = "https://github.com/shraderdm/candle.git", rev = "bf35cbadc15b2c7a63edb77534c46b1799a3493e", optional = true }
 tokenizers = { version = "0.21.0", default-features = false, features = ["http", "onig"] }
 hf-hub = { version = "0.4.1", default-features = false, features = ["rustls-tls"] }
 safetensors = "0.4.1"
@@ -137,3 +143,8 @@ path = "examples/test_multimodal_embed.rs"
 # Note: Benchmark binaries are located in ../bench/scripts/rust/candle-binding/
 # They are not included in the library build to keep it self-contained.
 # To run benchmarks, use the workspace-level Cargo.toml or run them directly from the bench directory.
+
+# NOTE: The previous `[patch."https://github.com/huggingface/candle"]` block was
+# replaced 2026-05-14 by direct path deps in the `[dependencies]` section above.
+# Cargo's `[patch]` requires semver-compatible versions and refused to apply
+# across the 0.9.2-alpha.1 -> 0.10.2 version gap. Direct path deps bypass that.
