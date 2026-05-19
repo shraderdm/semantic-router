@@ -592,7 +592,143 @@ struct SigLIPVisionEncoder {
     patch_embedding: SigLIPPatchEmbedding,
     layers: Vec<SigLIPEncoderLayer>,
     post_layernorm: LayerNorm,
-    head: Option<Linear>,
+    head: Option<SigLIPHead>,
+}
+
+/// MultiheadAttention compatible with PyTorch's nn.MultiheadAttention combined-QKV
+/// in_proj_weight format. Mirrors candle-transformers/src/models/siglip.rs:292.
+/// Used by SigLIP-base / SigLIP2 attentional probe pooling.
+#[derive(Clone, Debug)]
+struct SigLIPHeadAttention {
+    q_proj: Linear,
+    k_proj: Linear,
+    v_proj: Linear,
+    out_proj: Linear,
+    num_heads: usize,
+}
+
+impl SigLIPHeadAttention {
+    fn load(vb: VarBuilder, config: &MultiModalEmbeddingConfig) -> candle_core::Result<Self> {
+        let h = config.image_hidden_size;
+        let num_heads = config.image_num_heads;
+        let w_in_proj = vb.get((3 * h, h), "in_proj_weight")?.chunk(3, 0)?;
+        let b_in_proj = vb.get(3 * h, "in_proj_bias")?.chunk(3, 0)?;
+        let q_proj = Linear::new(w_in_proj[0].clone(), Some(b_in_proj[0].clone()));
+        let k_proj = Linear::new(w_in_proj[1].clone(), Some(b_in_proj[1].clone()));
+        let v_proj = Linear::new(w_in_proj[2].clone(), Some(b_in_proj[2].clone()));
+        let out_proj = linear(h, h, vb.pp("out_proj"))?;
+        Ok(Self {
+            q_proj,
+            k_proj,
+            v_proj,
+            out_proj,
+            num_heads,
+        })
+    }
+
+    fn separate_heads(&self, x: &candle_core::Tensor) -> candle_core::Result<candle_core::Tensor> {
+        let (b, n, c) = x.dims3()?;
+        x.reshape((b, n, self.num_heads, c / self.num_heads))?
+            .transpose(1, 2)?
+            .contiguous()
+    }
+
+    fn recombine_heads(&self, x: &candle_core::Tensor) -> candle_core::Result<candle_core::Tensor> {
+        let (b, n_heads, n_tokens, c_per_head) = x.dims4()?;
+        x.transpose(1, 2)?
+            .reshape((b, n_tokens, n_heads * c_per_head))
+    }
+
+    fn forward(
+        &self,
+        q: &candle_core::Tensor,
+        k: &candle_core::Tensor,
+        v: &candle_core::Tensor,
+    ) -> candle_core::Result<candle_core::Tensor> {
+        use candle_core::Module;
+        let q = self.q_proj.forward(&q.contiguous()?)?;
+        let k = self.k_proj.forward(&k.contiguous()?)?;
+        let v = self.v_proj.forward(&v.contiguous()?)?;
+
+        let q = self.separate_heads(&q)?;
+        let k = self.separate_heads(&k)?;
+        let v = self.separate_heads(&v)?;
+
+        let (_, _, _, c_per_head) = q.dims4()?;
+        let attn = (q.matmul(&k.t()?)? / (c_per_head as f64).sqrt())?;
+        let attn = candle_nn::ops::softmax_last_dim(&attn)?;
+
+        let out = attn.matmul(&v)?;
+        self.recombine_heads(&out)?.apply(&self.out_proj)
+    }
+}
+
+/// MLP for the attentional pooling head. Matches candle-transformers/src/models/siglip.rs:444
+/// in shape, uses gelu_erf for the activation consistent with the rest of this file's
+/// SigLIP encoder MLPs.
+#[derive(Clone, Debug)]
+struct SigLIPHeadMlp {
+    fc1: Linear,
+    fc2: Linear,
+}
+
+impl SigLIPHeadMlp {
+    fn load(vb: VarBuilder, config: &MultiModalEmbeddingConfig) -> candle_core::Result<Self> {
+        let fc1 = candle_nn::linear(
+            config.image_hidden_size,
+            config.image_intermediate_size,
+            vb.pp("fc1"),
+        )?;
+        let fc2 = candle_nn::linear(
+            config.image_intermediate_size,
+            config.image_hidden_size,
+            vb.pp("fc2"),
+        )?;
+        Ok(Self { fc1, fc2 })
+    }
+
+    fn forward(&self, xs: &candle_core::Tensor) -> candle_core::Result<candle_core::Tensor> {
+        use candle_core::Module;
+        xs.apply(&self.fc1)?.gelu_erf()?.apply(&self.fc2)
+    }
+}
+
+/// SigLIP attentional probe pooling head. Mirrors HF transformers'
+/// SiglipMultiheadAttentionPoolingHead (modeling_siglip.py) and
+/// candle-transformers/src/models/siglip.rs:351's MultiheadAttentionPoolingHead.
+/// Replaces the incorrect BERT-style mean+linear+tanh that was previously here.
+#[derive(Clone, Debug)]
+struct SigLIPHead {
+    probe: candle_core::Tensor,
+    attention: SigLIPHeadAttention,
+    layernorm: LayerNorm,
+    mlp: SigLIPHeadMlp,
+}
+
+impl SigLIPHead {
+    fn load(vb: VarBuilder, config: &MultiModalEmbeddingConfig) -> candle_core::Result<Self> {
+        let mlp = SigLIPHeadMlp::load(vb.pp("mlp"), config)?;
+        let layernorm = layer_norm(config.image_hidden_size, 1e-6, vb.pp("layernorm"))?;
+        let probe = vb.get((1, 1, config.image_hidden_size), "probe")?;
+        let attention = SigLIPHeadAttention::load(vb.pp("attention"), config)?;
+        Ok(Self {
+            probe,
+            attention,
+            layernorm,
+            mlp,
+        })
+    }
+
+    fn forward(&self, xs: &candle_core::Tensor) -> candle_core::Result<candle_core::Tensor> {
+        use candle_core::{IndexOp, Module};
+        let batch_size = xs.dim(0)?;
+        let probe = self.probe.repeat((batch_size, 1, 1))?;
+        let xs = self.attention.forward(&probe, xs, xs)?;
+        let residual = &xs;
+        let xs = xs.apply(&self.layernorm)?;
+        let xs = self.mlp.forward(&xs)?;
+        (xs + residual)?.i((.., 0))
+    }
 }
 
 impl SigLIPVisionEncoder {
@@ -606,19 +742,7 @@ impl SigLIPVisionEncoder {
             )?);
         }
         let post_layernorm = layer_norm(config.image_hidden_size, 1e-6, vb.pp("post_layernorm"))?;
-        let head = linear(
-            config.image_hidden_size,
-            config.image_hidden_size,
-            vb.pp("head.probe"),
-        )
-        .or_else(|_| {
-            candle_nn::linear(
-                config.image_hidden_size,
-                config.image_hidden_size,
-                vb.pp("head.dense"),
-            )
-        })
-        .ok();
+        let head = SigLIPHead::load(vb.pp("head"), config).ok();
         Ok(Self {
             patch_embedding,
             layers,
@@ -628,16 +752,23 @@ impl SigLIPVisionEncoder {
     }
 
     /// Returns pooler_output: [batch, hidden_size]
+    ///
+    /// SigLIP-base uses `SiglipMultiheadAttentionPoolingHead` (learned probe +
+    /// cross-attention + LayerNorm + MLP + residual). Replaces the prior
+    /// BERT-style `mean + Linear + tanh` which produced garbage cosines.
+    /// Mirrors candle-transformers/src/models/siglip.rs:373.
+    /// Fallback to mean-pool only kicks in when the head weights are missing
+    /// from the state dict (which they should never be for genuine SigLIP
+    /// checkpoints).
     fn forward(&self, pixel_values: &Tensor) -> candle_core::Result<Tensor> {
         let mut xs = self.patch_embedding.forward(pixel_values)?;
         for layer in &self.layers {
             xs = layer.forward(&xs)?;
         }
         xs = xs.apply(&self.post_layernorm)?;
-        let pooled = xs.mean(1)?;
         match &self.head {
-            Some(h) => pooled.apply(h)?.tanh(),
-            None => Ok(pooled),
+            Some(h) => h.forward(&xs),
+            None => xs.mean(1),
         }
     }
 }
@@ -2243,5 +2374,349 @@ mod integration_tests {
             Some(999), // exceeds embedding_dim
         );
         assert!(result.is_err(), "dim=999 should be rejected");
+    }
+
+    /// 2026-05-16 probe: encode passport_sample.jpg + the 8 identifier
+    /// anchors from #1896's pack via candle-binding's exact production
+    /// pipeline. Dump cosines so we can compare to Python's 0.72 measurements
+    /// and the cluster's 0.11 measurements. If candle here produces ~0.72,
+    /// the cluster bug is in the FFI/Go layer. If ~0.11, the bug is in
+    /// candle's encoder itself.
+    #[test]
+    #[ignore = "requires model files; run with MULTIMODAL_MODEL_PATH set"]
+    fn test_passport_vs_identifier_anchors_2026_05_16_probe() {
+        let (model, tokenizer) = load_model_and_tokenizer();
+
+        let fixture_path = std::env::var("PASSPORT_FIXTURE_PATH")
+            .expect("PASSPORT_FIXTURE_PATH env var must point at passport_sample.jpg");
+        let bytes = std::fs::read(&fixture_path).expect("could not read passport fixture");
+        let device = model.device();
+        let tensor = image_bytes_to_tensor(&bytes, device);
+
+        let img_emb = to_vec(
+            &model
+                .encode_image(&tensor)
+                .expect("encode_image failed"),
+        );
+        eprintln!(
+            "image embedding norm: {:.6}",
+            img_emb.iter().map(|x| x * x).sum::<f32>().sqrt()
+        );
+
+        let identifier_anchors = [
+            "photograph of a passport page",
+            "photograph of a driver's license or national ID card",
+            "photograph of a credit card or payment card",
+            "photograph of an employee or visitor badge",
+            "photograph of a healthcare insurance card",
+            "photograph of a patient wristband or hospital identifier",
+            "photograph of a tax document or paystub with personal details",
+            "photograph of a paper form filled in with personal information",
+        ];
+
+        eprintln!("\n=== candle-binding cosines (passport vs identifier_document_imagery anchors) ===");
+        let mut max_cos = f32::MIN;
+        let mut max_idx = 0;
+        for (i, anchor) in identifier_anchors.iter().enumerate() {
+            let text_emb = to_vec(&encode_text_str(&model, &tokenizer, anchor));
+            let cos = cosine_sim(&img_emb, &text_emb);
+            eprintln!("  {:.4}  {}", cos, anchor);
+            if cos > max_cos {
+                max_cos = cos;
+                max_idx = i;
+            }
+        }
+        eprintln!(
+            "\nMAX identifier cosine: {:.4} (anchor: {})",
+            max_cos, identifier_anchors[max_idx]
+        );
+        eprintln!("Python reference:      0.7204 (from probe_full_5model.py 2026-05-15)");
+        eprintln!("Cluster k8s e2e:       0.1132 (router_replay_complete event today)");
+    }
+
+    /// Full 3 fixtures x 3 rules probe after the SigLIPHead pooling fix.
+    /// Validates that the proper attentional probe pooling produces correct
+    /// routing decisions matching Python's 3/3 on Corpus A.
+    #[test]
+    #[ignore = "requires model files; run with MULTIMODAL_MODEL_PATH and FIXTURE_DIR set"]
+    fn test_corpus_a_full_3x3_after_pooling_fix() {
+        let (model, tokenizer) = load_model_and_tokenizer();
+        let fixture_dir = std::env::var("FIXTURE_DIR")
+            .expect("FIXTURE_DIR must point at e2e/testcases/testdata/image-fixtures (or docs/image-fixtures)");
+
+        let fixtures = [
+            ("passport_sample.jpg", "identifier_document_imagery"),
+            ("code_screenshot.jpg", "code_or_terminal_imagery"),
+            ("conference_room.jpg", "ambient_office_imagery"),
+        ];
+        let rules: [(&str, &[&str]); 3] = [
+            (
+                "identifier_document_imagery",
+                &[
+                    "photograph of a passport page",
+                    "photograph of a driver's license or national ID card",
+                    "photograph of a credit card or payment card",
+                    "photograph of an employee or visitor badge",
+                    "photograph of a healthcare insurance card",
+                    "photograph of a patient wristband or hospital identifier",
+                    "photograph of a tax document or paystub with personal details",
+                    "photograph of a paper form filled in with personal information",
+                ],
+            ),
+            (
+                "code_or_terminal_imagery",
+                &[
+                    "screenshot of source code in an editor",
+                    "terminal or shell window screenshot",
+                    "screenshot of a log file or stack trace",
+                    "git diff or pull-request review screenshot",
+                    "screenshot of a debugger paused at a breakpoint",
+                    "command-line build output or test runner output",
+                    "screenshot of an API response or HTTP request body",
+                    "screenshot of a database client or SQL query result",
+                ],
+            ),
+            (
+                "ambient_office_imagery",
+                &[
+                    "photograph of a whiteboard with handwritten notes",
+                    "photograph of a conference room or meeting space",
+                    "photograph of an office workspace or desk surface",
+                    "photograph of a building lobby or interior hallway",
+                    "photograph of an office printer or shared equipment",
+                    "photograph of a coffee cup or notebook on a desk",
+                    "photograph of indoor potted plants or office decor",
+                    "photograph of a wide factory floor or warehouse aisle",
+                ],
+            ),
+        ];
+
+        // Pre-encode all anchors once
+        let mut rule_anchor_embs: Vec<(String, Vec<Vec<f32>>)> = Vec::with_capacity(3);
+        for (rule_name, anchors) in &rules {
+            let mut embs = Vec::with_capacity(anchors.len());
+            for a in anchors.iter() {
+                embs.push(to_vec(&encode_text_str(&model, &tokenizer, a)));
+            }
+            rule_anchor_embs.push((rule_name.to_string(), embs));
+        }
+
+        let mut correct = 0;
+        let mut total = 0;
+        eprintln!("\n=== Corpus A full 3x3 results (after SigLIPHead fix) ===\n");
+        for (fname, expected_rule) in &fixtures {
+            let path = format!("{}/{}", fixture_dir, fname);
+            let bytes = std::fs::read(&path).expect(&format!("read fixture {}", path));
+            let device = model.device();
+            let tensor = image_bytes_to_tensor(&bytes, device);
+            let img_emb = to_vec(
+                &model
+                    .encode_image(&tensor)
+                    .expect("encode_image failed"),
+            );
+
+            let mut winner_rule = "";
+            let mut winner_cos = f32::MIN;
+            for (rule_name, anchor_embs) in &rule_anchor_embs {
+                let mut max_cos = f32::MIN;
+                for emb in anchor_embs {
+                    let c = cosine_sim(&img_emb, emb);
+                    if c > max_cos {
+                        max_cos = c;
+                    }
+                }
+                eprintln!("  {:30} | {:30} -> {:.4}", fname, rule_name, max_cos);
+                if max_cos > winner_cos {
+                    winner_cos = max_cos;
+                    winner_rule = rule_name;
+                }
+            }
+            let is_correct = winner_rule == *expected_rule;
+            if is_correct {
+                correct += 1;
+            }
+            total += 1;
+            eprintln!(
+                "  -> winner={} (expected={}) cosine={:.4} {}",
+                winner_rule,
+                expected_rule,
+                winner_cos,
+                if is_correct { "✓" } else { "✗" },
+            );
+            eprintln!();
+        }
+        eprintln!(
+            "\n*** RESULT: {}/{} correct (Python reference: 3/3) ***",
+            correct, total
+        );
+        assert_eq!(correct, total, "expected 3/3 after fix, got {}/{}", correct, total);
+    }
+
+    #[test]
+    #[ignore = "requires model files; run with MULTIMODAL_MODEL_PATH, CORPUS_B_FIXTURE_DIR, CORPUS_B_OUTPUT_CSV set"]
+    fn test_corpus_b_recovered_full_11x21() {
+        let (model, tokenizer) = load_model_and_tokenizer();
+        let fixture_dir = std::env::var("CORPUS_B_FIXTURE_DIR")
+            .expect("CORPUS_B_FIXTURE_DIR must point at docs/probe-2026-05-12-verticals-recovered/fixtures");
+        let output_csv = std::env::var("CORPUS_B_OUTPUT_CSV")
+            .expect("CORPUS_B_OUTPUT_CSV must be a writable file path");
+        let model_label = std::env::var("CORPUS_B_MODEL_LABEL")
+            .unwrap_or_else(|_| "multi-modal-embed-small (candle-binding)".to_string());
+
+        let fixtures: [(&str, &str); 11] = [
+            ("SemiconductorManufacturing.jpg", "semiconductor_manufacturing"),
+            ("car-engines-at-conveyor-line.jpg", "OOD"),
+            ("fcf44a6840870c3f19f2fb669d13ebb9.jpg", "semiconductor_manufacturing"),
+            ("download.jpeg", "offshore_oil_and_gas"),
+            ("Holstein_at_Dusk.jpg", "offshore_oil_and_gas"),
+            ("NOC 84101-1146039220.jpg", "offshore_oil_and_gas"),
+            ("Xray.jpg", "medical_imaging_studies"),
+            ("hand-xray-177559095.jpg", "medical_imaging_studies"),
+            ("ID_med_hospital-wristband-600x330.jpg", "medical_imaging_studies"),
+            ("Blog_Header_Patient_Flow_and_4_Tips_for_Improving_07262021.png", "medical_imaging_studies"),
+            ("CIRH Blog Image.png", "medical_imaging_studies"),
+        ];
+
+        // Byte-faithful recovery of the 2026-05-12 SemanticRouter CR's 21-anchor candidate set.
+        let rules: [(&str, &[&str]); 3] = [
+            (
+                "medical_imaging_studies",
+                &[
+                    "grayscale chest X-ray radiograph showing rib cage and lungs",
+                    "MRI brain scan cross-section in greyscale showing anatomy",
+                    "CT computed tomography scan slice of internal organs",
+                    "ultrasound sonogram printout showing soft tissue",
+                    "mammography X-ray image of breast tissue",
+                    "diagnostic radiograph of human bones and joints",
+                    "digital radiograph displayed on a hospital lightbox",
+                ],
+            ),
+            (
+                "offshore_oil_and_gas",
+                &[
+                    "offshore oil drilling platform standing in the open ocean",
+                    "semi-submersible drilling rig with crew quarters on water",
+                    "jack-up offshore rig with extended steel legs on the seabed",
+                    "aerial photograph of an offshore drilling platform at sea",
+                    "offshore oil and gas production facility with a flare stack",
+                    "marine drilling derrick tower on a floating drilling vessel",
+                    "floating production storage and offloading vessel at sea",
+                ],
+            ),
+            (
+                "semiconductor_manufacturing",
+                &[
+                    "semiconductor cleanroom with workers wearing white bunny suits",
+                    "silicon wafer with integrated circuit patterns being processed",
+                    "photolithography equipment inside a chip fabrication facility",
+                    "wide view of a semiconductor fab interior with yellow lighting",
+                    "engineers in cleanroom suits handling silicon wafers",
+                    "microscopic view of an integrated circuit on a chip substrate",
+                    "wafer carrier cassette inside a semiconductor manufacturing tool",
+                ],
+            ),
+        ];
+
+        // Pre-encode all anchors once
+        let mut rule_anchor_embs: Vec<(String, Vec<(String, Vec<f32>)>)> = Vec::with_capacity(3);
+        for (rule_name, anchors) in &rules {
+            let mut embs = Vec::with_capacity(anchors.len());
+            for a in anchors.iter() {
+                embs.push((a.to_string(), to_vec(&encode_text_str(&model, &tokenizer, a))));
+            }
+            rule_anchor_embs.push((rule_name.to_string(), embs));
+        }
+
+        // Open CSV
+        let mut csv = String::new();
+        csv.push_str(
+            "model,fixture,expected_rule,winning_rule,winning_cosine,winning_anchor,\
+             max_medical,max_offshore,max_semiconductor,in_rule_correct,ood_clean\n",
+        );
+
+        let threshold: f32 = 0.10;
+        let mut in_rule_total = 0;
+        let mut in_rule_correct = 0;
+        let mut ood_total = 0;
+        let mut ood_clean = 0;
+        eprintln!("\n=== Corpus B (recovered 2026-05-12 verticals) | {} ===\n", model_label);
+        for (fname, expected_rule) in &fixtures {
+            let path = format!("{}/{}", fixture_dir, fname);
+            let bytes = std::fs::read(&path).expect(&format!("read fixture {}", path));
+            let device = model.device();
+            let tensor = image_bytes_to_tensor(&bytes, device);
+            let img_emb = to_vec(
+                &model.encode_image(&tensor).expect("encode_image failed"),
+            );
+
+            let mut per_rule_max: std::collections::HashMap<&str, (f32, String)> =
+                std::collections::HashMap::new();
+            for (rule_name, anchor_embs) in &rule_anchor_embs {
+                let mut max_cos = f32::MIN;
+                let mut max_anchor = String::new();
+                for (anchor_text, emb) in anchor_embs {
+                    let c = cosine_sim(&img_emb, emb);
+                    if c > max_cos {
+                        max_cos = c;
+                        max_anchor = anchor_text.clone();
+                    }
+                }
+                per_rule_max.insert(rule_name.as_str(), (max_cos, max_anchor));
+            }
+
+            let (winner_rule, (winner_cos, winner_anchor)) = per_rule_max
+                .iter()
+                .max_by(|a, b| a.1 .0.partial_cmp(&b.1 .0).unwrap())
+                .map(|(k, v)| (*k, v.clone()))
+                .unwrap();
+
+            let in_rule_ok = *expected_rule != "OOD"
+                && winner_rule == *expected_rule
+                && winner_cos >= threshold;
+            let ood_ok = *expected_rule == "OOD" && winner_cos < threshold;
+            if *expected_rule == "OOD" {
+                ood_total += 1;
+                if ood_ok { ood_clean += 1; }
+            } else {
+                in_rule_total += 1;
+                if in_rule_ok { in_rule_correct += 1; }
+            }
+
+            let max_med = per_rule_max.get("medical_imaging_studies").map(|v| v.0).unwrap_or(0.0);
+            let max_off = per_rule_max.get("offshore_oil_and_gas").map(|v| v.0).unwrap_or(0.0);
+            let max_sem = per_rule_max.get("semiconductor_manufacturing").map(|v| v.0).unwrap_or(0.0);
+
+            eprintln!(
+                "  {:55} | exp={:30} win={:30} cos={:.4} anchor=\"{}\" {}",
+                fname,
+                expected_rule,
+                winner_rule,
+                winner_cos,
+                winner_anchor,
+                if *expected_rule == "OOD" {
+                    if ood_ok { "OOD-CLEAN" } else { "OOD-FIRES" }
+                } else if in_rule_ok { "✓" } else { "✗" },
+            );
+
+            // CSV row (quote anchor for embedded commas/spaces safety: anchors here don't use commas)
+            csv.push_str(&format!(
+                "{},{},{},{},{:.4},{},{:.4},{:.4},{:.4},{},{}\n",
+                model_label,
+                fname,
+                expected_rule,
+                winner_rule,
+                winner_cos,
+                winner_anchor.replace(',', ";"),
+                max_med, max_off, max_sem,
+                if in_rule_ok { "True" } else { "False" },
+                if ood_ok { "True" } else { "False" },
+            ));
+        }
+        eprintln!(
+            "\n*** RESULT: in-rule {}/{} correct, OOD-clean {}/{} | {} ***",
+            in_rule_correct, in_rule_total, ood_clean, ood_total, model_label
+        );
+        std::fs::write(&output_csv, csv).expect("write output csv");
+        eprintln!("wrote {}", output_csv);
     }
 }
