@@ -1,0 +1,361 @@
+model,corpus,fixture,expected_rule,rule,candidate,cosine
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a passport page,0.7204
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.6205
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.4432
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.4217
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.4948
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.3285
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.5940
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.5440
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.2059
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.1419
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.1645
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.1166
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,-0.0180
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.1028
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.2554
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.2928
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.2998
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.1567
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.1357
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0926
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.2964
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.3715
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0944
+llm-semantic-router/multi-modal-embed-small,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.0509
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a passport page,0.1166
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.1323
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.1451
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of an employee or visitor badge,-0.0532
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.1190
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.1435
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.2607
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.2570
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.4848
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.2581
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.3974
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.3174
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.2314
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.3446
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.3549
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.3529
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.2203
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.0005
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.1840
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,-0.0030
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.2078
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.1419
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0011
+llm-semantic-router/multi-modal-embed-small,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.0279
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a passport page,0.0857
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0661
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0579
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of an employee or visitor badge,-0.0018
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.1632
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.0184
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.1043
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.1482
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.1534
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.1687
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0529
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.1431
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.1075
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.0037
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.0316
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.2236
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.1709
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.7099
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.4663
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.5241
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.2197
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.2133
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.2522
+llm-semantic-router/multi-modal-embed-small,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.3995
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a passport page,0.1081
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0660
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0011
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0428
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.0164
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0196
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,-0.0069
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0419
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of source code in an editor,-0.0092
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,terminal or shell window screenshot,-0.0037
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0005
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.0708
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,-0.0759
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.0490
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,-0.0713
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,-0.0446
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,-0.0389
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a conference room or meeting space,-0.0553
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,-0.0093
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,-0.0339
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,-0.0142
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,-0.0027
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,-0.0438
+google/siglip-base-patch16-512,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0785
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a passport page,-0.0055
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,-0.0139
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0048
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0079
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a healthcare insurance card,-0.0299
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0031
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,-0.0119
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0187
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.0326
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.0613
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0065
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.0004
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.0575
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.0644
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.0023
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.0230
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.0180
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a conference room or meeting space,-0.0125
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0403
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,-0.0153
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0349
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0033
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,-0.0131
+google/siglip-base-patch16-512,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0411
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a passport page,-0.0482
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,-0.0732
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a credit card or payment card,-0.0500
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of an employee or visitor badge,-0.0259
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a healthcare insurance card,-0.0846
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0581
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,-0.1069
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,-0.0618
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of source code in an editor,-0.0609
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,terminal or shell window screenshot,-0.0401
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,-0.0627
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.1089
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,-0.0978
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.0385
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,-0.1054
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,-0.0781
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,-0.0258
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.1061
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0536
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0233
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0317
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0000
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0233
+google/siglip-base-patch16-512,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0429
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a passport page,0.1369
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0943
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0541
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0895
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.0635
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.0064
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.0363
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0773
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.0191
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.0074
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0222
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.0117
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.0268
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.0062
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.0113
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.0323
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,-0.0170
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a conference room or meeting space,-0.0182
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0157
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0023
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0269
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,-0.0007
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,-0.0131
+google/siglip2-base-patch16-naflex,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0376
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a passport page,0.0353
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0296
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0352
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0423
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.0090
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.0327
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.0320
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0602
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.1198
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.1295
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0776
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.0655
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.0913
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.1149
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.0608
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.0892
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.0594
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.0385
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0528
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0304
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0703
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0385
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0301
+google/siglip2-base-patch16-naflex,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.0045
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a passport page,-0.0256
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,-0.0590
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a credit card or payment card,-0.0293
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0138
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a healthcare insurance card,-0.0496
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0562
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,-0.0456
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,-0.0098
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of source code in an editor,-0.0067
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,terminal or shell window screenshot,-0.0103
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0120
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.0390
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.0019
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.0209
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,-0.0094
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,-0.0090
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.0384
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.1440
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0849
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0615
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0530
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0241
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0427
+google/siglip2-base-patch16-naflex,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0164
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a passport page,0.1270
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0736
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0231
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0547
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.0286
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0001
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.0107
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0582
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.0176
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.0288
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,-0.0053
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.0330
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,-0.0049
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.0045
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,-0.0152
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,-0.0127
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,-0.0543
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a conference room or meeting space,-0.0551
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0188
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,-0.0109
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,-0.0303
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,-0.0261
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,-0.0530
+google/siglip2-so400m-patch14-384,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0624
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a passport page,0.0074
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.0154
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.0297
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.0189
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.0034
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0014
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.0126
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.0366
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.1332
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.1381
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0883
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.0636
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.1090
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.1210
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.0216
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.0760
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.0419
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.0111
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0581
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0025
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0487
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0098
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,-0.0047
+google/siglip2-so400m-patch14-384,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0220
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a passport page,-0.0619
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,-0.0555
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a credit card or payment card,-0.0179
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of an employee or visitor badge,-0.0182
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a healthcare insurance card,-0.0560
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,-0.0650
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,-0.0572
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,-0.0410
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.0132
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,terminal or shell window screenshot,-0.0073
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.0057
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,-0.0137
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,-0.0335
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,command-line build output or test runner output,-0.0170
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,-0.0420
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,-0.0367
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.0351
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.1420
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.0921
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.0640
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.0184
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.0223
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0291
+google/siglip2-so400m-patch14-384,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,-0.0176
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a passport page,0.3973
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.3970
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.4076
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.3997
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.3905
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.3482
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.4250
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.4149
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.2891
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.2598
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.3074
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.2138
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.1841
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.2243
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.3130
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.2212
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.3742
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.2518
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.2864
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.1810
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.2881
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.2953
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.0963
+llm-semantic-router/multi-modal-embed-large,A_PR1896,passport_sample.jpg,identifier_document_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.2394
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a passport page,0.2914
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.3075
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.3448
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.3007
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.2756
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.3247
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.2480
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.3184
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.4069
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.4029
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.3758
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.3060
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.3824
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.3386
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.2771
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.3238
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.3971
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.3146
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.4114
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.1857
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.4911
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.4079
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.1485
+llm-semantic-router/multi-modal-embed-large,A_PR1896,code_screenshot.jpg,code_or_terminal_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.2750
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a passport page,0.1941
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a driver's license or national ID card,0.1370
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a credit card or payment card,0.2543
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of an employee or visitor badge,0.2590
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a healthcare insurance card,0.2216
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a patient wristband or hospital identifier,0.1746
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a tax document or paystub with personal details,0.2017
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,identifier_document_imagery,photograph of a paper form filled in with personal information,0.2291
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of source code in an editor,0.1962
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,terminal or shell window screenshot,0.1735
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a log file or stack trace,0.1959
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,git diff or pull-request review screenshot,0.1476
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a debugger paused at a breakpoint,0.1266
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,command-line build output or test runner output,0.0743
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of an API response or HTTP request body,0.1443
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,code_or_terminal_imagery,screenshot of a database client or SQL query result,0.1823
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a whiteboard with handwritten notes,0.2814
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a conference room or meeting space,0.4625
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office workspace or desk surface,0.4350
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a building lobby or interior hallway,0.3442
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of an office printer or shared equipment,0.3616
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a coffee cup or notebook on a desk,0.3399
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of indoor potted plants or office decor,0.2762
+llm-semantic-router/multi-modal-embed-large,A_PR1896,conference_room.jpg,ambient_office_imagery,ambient_office_imagery,photograph of a wide factory floor or warehouse aisle,0.3690
