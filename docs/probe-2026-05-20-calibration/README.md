@@ -10,14 +10,22 @@ The same measurement is run twice: once with the candle-binding SigLIP vision en
 
 ## Files
 
+Candle-binding measurements (Rust, post-pooling-fix, 2026-05-20):
+
 - `calibration_2026_05_20_prenorm_full.csv` - per-image cosine against every candidate anchor in the pack, PRE-normalization. One row per image; one column per candidate.
 - `calibration_2026_05_20_postnorm_full.csv` - same layout, POST-normalization.
 - `calibration_2026_05_20_prenorm_summary.csv` - per-image rollup PRE-normalization: bucket, per-rule max cosine, top rule, top anchor within the top rule, top cosine.
 - `calibration_2026_05_20_postnorm_summary.csv` - same layout, POST-normalization.
 
+Python reference measurements (HF transformers production-path pipeline, 2026-05-21):
+
+- `mmes_2026_05_21_full.csv` - apples-to-apples Python reference cosines for the same 20 images x 24 anchors on `multi-modal-embed-small`. Same column layout as the candle-binding "full" CSVs above so a side-by-side diff isolates encoder drift per cell.
+- `mmes_2026_05_21_summary.csv` - per-image rollup, same layout as the candle-binding "summary" CSVs.
+- `probe_mmes_20img.py` - the probe script. Reproduces the production-path mmes pipeline (SigLIP-base-patch16-512 vision_model.pooler_output -> trained Linear(768->384) projection -> L2-normalize for images; MiniLM-L6 mean-pool -> L2-normalize for text), loads `model.pt` from HF Hub, and writes the two CSVs above.
+
 ## Example queries
 
-Top cosine for `inrule_identifier_passport.jpg` POST-normalization:
+Top cosine for `inrule_identifier_passport.jpg` POST-normalization (candle-binding):
 
 ```
 awk -F, '$1 == "inrule_identifier_passport.jpg" {print $8}' calibration_2026_05_20_postnorm_summary.csv
@@ -25,13 +33,21 @@ awk -F, '$1 == "inrule_identifier_passport.jpg" {print $8}' calibration_2026_05_
 
 Returns: `0.6991`
 
-Top cosine for the same image PRE-normalization:
+Top cosine for the same image PRE-normalization (candle-binding):
 
 ```
 awk -F, '$1 == "inrule_identifier_passport.jpg" {print $8}' calibration_2026_05_20_prenorm_summary.csv
 ```
 
 Returns: `0.6843`
+
+Cosine on the `passport` anchor for the same image, Python reference (apples-to-apples comparison target):
+
+```
+awk -F, '$1 == "inrule_identifier_passport.jpg" {print $3}' mmes_2026_05_21_full.csv
+```
+
+Returns: `0.7044`
 
 Margin (in-rule floor minus adversarial ceiling) on `ambient_office_imagery` POST-normalization:
 
