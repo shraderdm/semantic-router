@@ -2773,4 +2773,318 @@ mod integration_tests {
         std::fs::write(&output_csv, csv).expect("write output csv");
         eprintln!("wrote {}", output_csv);
     }
+
+    /// Calibration test for the image-routing anchor pack
+    /// (`config/signal/embedding/image-routing.yaml`).
+    ///
+    /// Encodes all 24 anchors plus every `.jpg`/`.jpeg`/`.png` in
+    /// `CALIBRATION_FIXTURE_DIR`, computes the full cosine matrix, and writes
+    /// two CSVs:
+    ///
+    ///   <stem>_summary.csv: image,bucket,max_identifier,max_code,max_ambient,
+    ///                       top_rule,top_anchor,top_cosine
+    ///   <stem>_full.csv:    image,bucket,<24 anchor short-names>
+    ///
+    /// Bucket comes from the filename prefix (`inrule_` / `adversarial_` /
+    /// `ood_`). Verification-branch only; does not ship upstream.
+    #[test]
+    #[ignore = "requires model files; run with MULTIMODAL_MODEL_PATH and CALIBRATION_FIXTURE_DIR set"]
+    fn test_calibration_image_routing_pack() {
+        let (model, tokenizer) = load_model_and_tokenizer();
+        let fixture_dir = std::env::var("CALIBRATION_FIXTURE_DIR")
+            .expect("CALIBRATION_FIXTURE_DIR must point at a flat dir of calibration images");
+        let output_stem = std::env::var("CALIBRATION_OUTPUT_STEM").unwrap_or_else(|_| {
+            let ts = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0);
+            format!("/tmp/calibration_{}", ts)
+        });
+
+        // 24 anchors grouped by rule. Anchor SHORT_NAMES are the CSV column
+        // headers in the same column order, so a Python comparator can be
+        // pre-built against this schema.
+        // rule -> &[(short_name, anchor_text)]
+        let rules: [(&str, &[(&str, &str)]); 3] = [
+            (
+                "identifier_document_imagery",
+                &[
+                    ("passport", "photograph of a passport page"),
+                    (
+                        "drivers_license",
+                        "photograph of a driver's license or national ID card",
+                    ),
+                    ("credit_card", "photograph of a credit card or payment card"),
+                    ("badge", "photograph of an employee or visitor badge"),
+                    ("insurance_card", "photograph of a healthcare insurance card"),
+                    (
+                        "wristband",
+                        "photograph of a patient wristband or hospital identifier",
+                    ),
+                    (
+                        "tax_doc",
+                        "photograph of a tax document or paystub with personal details",
+                    ),
+                    (
+                        "paper_form",
+                        "photograph of a paper form filled in with personal information",
+                    ),
+                ],
+            ),
+            (
+                "code_or_terminal_imagery",
+                &[
+                    ("vscode_code", "screenshot of source code in an editor"),
+                    ("terminal", "terminal or shell window screenshot"),
+                    ("stacktrace", "screenshot of a log file or stack trace"),
+                    ("git_diff", "git diff or pull-request review screenshot"),
+                    (
+                        "debugger",
+                        "screenshot of a debugger paused at a breakpoint",
+                    ),
+                    (
+                        "build_output",
+                        "command-line build output or test runner output",
+                    ),
+                    (
+                        "api_response",
+                        "screenshot of an API response or HTTP request body",
+                    ),
+                    (
+                        "db_client",
+                        "screenshot of a database client or SQL query result",
+                    ),
+                ],
+            ),
+            (
+                "ambient_office_imagery",
+                &[
+                    (
+                        "whiteboard",
+                        "photograph of a whiteboard with handwritten notes",
+                    ),
+                    (
+                        "conference_room",
+                        "photograph of a conference room or meeting space",
+                    ),
+                    (
+                        "desk_surface",
+                        "photograph of an office workspace or desk surface",
+                    ),
+                    (
+                        "lobby",
+                        "photograph of a building lobby or interior hallway",
+                    ),
+                    (
+                        "printer",
+                        "photograph of an office printer or shared equipment",
+                    ),
+                    (
+                        "coffee_notebook",
+                        "photograph of a coffee cup or notebook on a desk",
+                    ),
+                    (
+                        "plants",
+                        "photograph of indoor potted plants or office decor",
+                    ),
+                    (
+                        "factory_floor",
+                        "photograph of a wide factory floor or warehouse aisle",
+                    ),
+                ],
+            ),
+        ];
+
+        // Pre-encode anchors once.
+        // Flat list preserves rule-major ordering for the _full.csv columns:
+        //   identifier (8), then code (8), then ambient (8).
+        let mut all_anchors_flat: Vec<(String, String, Vec<f32>)> = Vec::with_capacity(24);
+        let mut rule_anchor_embs: Vec<(String, Vec<(String, Vec<f32>)>)> = Vec::with_capacity(3);
+        for (rule_name, anchors) in &rules {
+            let mut embs = Vec::with_capacity(anchors.len());
+            for (short, text) in anchors.iter() {
+                let emb = to_vec(&encode_text_str(&model, &tokenizer, text));
+                embs.push((short.to_string(), emb.clone()));
+                all_anchors_flat.push((rule_name.to_string(), short.to_string(), emb));
+            }
+            rule_anchor_embs.push((rule_name.to_string(), embs));
+        }
+
+        // List image fixtures (flat dir, filter to .jpg/.jpeg/.png).
+        let mut fixtures: Vec<std::path::PathBuf> = std::fs::read_dir(&fixture_dir)
+            .expect("read fixture dir")
+            .filter_map(|e| e.ok().map(|e| e.path()))
+            .filter(|p| {
+                p.extension()
+                    .and_then(|s| s.to_str())
+                    .map(|s| {
+                        let s = s.to_lowercase();
+                        s == "jpg" || s == "jpeg" || s == "png"
+                    })
+                    .unwrap_or(false)
+            })
+            .collect();
+        fixtures.sort();
+        if fixtures.is_empty() {
+            panic!(
+                "no .jpg/.jpeg/.png images found in CALIBRATION_FIXTURE_DIR={}",
+                fixture_dir
+            );
+        }
+        eprintln!(
+            "\n=== Calibration: {} images x 24 anchors ===\n",
+            fixtures.len()
+        );
+
+        // CSVs. Use simple string buffers to mirror the existing test style.
+        let mut summary_csv = String::new();
+        summary_csv.push_str(
+            "image,bucket,max_identifier,max_code,max_ambient,top_rule,top_anchor,top_cosine\n",
+        );
+
+        let mut full_csv = String::new();
+        full_csv.push_str("image,bucket");
+        for (_, short, _) in &all_anchors_flat {
+            full_csv.push(',');
+            full_csv.push_str(short);
+        }
+        full_csv.push('\n');
+
+        let mut highest_inrule: f32 = f32::MIN;
+        let mut lowest_inrule: f32 = f32::MAX;
+        let mut highest_ood: f32 = f32::MIN;
+        let mut highest_adversarial: f32 = f32::MIN;
+
+        for path in &fixtures {
+            let fname = path
+                .file_name()
+                .and_then(|s| s.to_str())
+                .unwrap_or("<bad-name>")
+                .to_string();
+            let bucket = if fname.starts_with("inrule_") {
+                "inrule"
+            } else if fname.starts_with("adversarial_") {
+                "adversarial"
+            } else if fname.starts_with("ood_") {
+                "ood"
+            } else {
+                "unknown"
+            };
+            let bytes = match std::fs::read(path) {
+                Ok(b) => b,
+                Err(e) => {
+                    eprintln!("  skipping {}: read failed: {}", fname, e);
+                    continue;
+                }
+            };
+            let device = model.device();
+            let tensor = image_bytes_to_tensor(&bytes, device);
+            let img_emb = to_vec(
+                &model.encode_image(&tensor).expect("encode_image failed"),
+            );
+
+            // Per-rule max + per-anchor cosines.
+            let mut rule_max: std::collections::HashMap<&str, (f32, String)> =
+                std::collections::HashMap::new();
+            for (rule_name, anchor_embs) in &rule_anchor_embs {
+                let mut max_cos = f32::MIN;
+                let mut max_short = String::new();
+                for (short, emb) in anchor_embs {
+                    let c = cosine_sim(&img_emb, emb);
+                    if c > max_cos {
+                        max_cos = c;
+                        max_short = short.clone();
+                    }
+                }
+                rule_max.insert(rule_name.as_str(), (max_cos, max_short));
+            }
+
+            let max_identifier = rule_max
+                .get("identifier_document_imagery")
+                .map(|v| v.0)
+                .unwrap_or(0.0);
+            let max_code = rule_max
+                .get("code_or_terminal_imagery")
+                .map(|v| v.0)
+                .unwrap_or(0.0);
+            let max_ambient = rule_max
+                .get("ambient_office_imagery")
+                .map(|v| v.0)
+                .unwrap_or(0.0);
+
+            let (top_rule, (top_cos, top_anchor)) = rule_max
+                .iter()
+                .max_by(|a, b| a.1 .0.partial_cmp(&b.1 .0).unwrap())
+                .map(|(k, v)| (k.to_string(), v.clone()))
+                .unwrap();
+
+            // Bucket gut-check tallies.
+            match bucket {
+                "inrule" => {
+                    if top_cos > highest_inrule {
+                        highest_inrule = top_cos;
+                    }
+                    if top_cos < lowest_inrule {
+                        lowest_inrule = top_cos;
+                    }
+                }
+                "ood" => {
+                    if top_cos > highest_ood {
+                        highest_ood = top_cos;
+                    }
+                }
+                "adversarial" => {
+                    if top_cos > highest_adversarial {
+                        highest_adversarial = top_cos;
+                    }
+                }
+                _ => {}
+            }
+
+            // _summary.csv row
+            summary_csv.push_str(&format!(
+                "{},{},{:.4},{:.4},{:.4},{},{},{:.4}\n",
+                fname, bucket, max_identifier, max_code, max_ambient, top_rule, top_anchor, top_cos
+            ));
+
+            // _full.csv row: per-anchor cosines in rule-major order.
+            full_csv.push_str(&fname);
+            full_csv.push(',');
+            full_csv.push_str(bucket);
+            for (_, _short, emb) in &all_anchors_flat {
+                let c = cosine_sim(&img_emb, emb);
+                full_csv.push_str(&format!(",{:.4}", c));
+            }
+            full_csv.push('\n');
+
+            eprintln!(
+                "  {:50} | bucket={:11} top={:30} cos={:.4}",
+                fname, bucket, top_rule, top_cos
+            );
+        }
+
+        let summary_path = format!("{}_summary.csv", output_stem);
+        let full_path = format!("{}_full.csv", output_stem);
+        std::fs::write(&summary_path, summary_csv).expect("write summary csv");
+        std::fs::write(&full_path, full_csv).expect("write full csv");
+
+        eprintln!("\n=== Encoder gut-check ===");
+        if highest_inrule > f32::MIN {
+            eprintln!("  highest in-rule top cosine     : {:.4}", highest_inrule);
+        }
+        if lowest_inrule < f32::MAX {
+            eprintln!("  lowest in-rule top cosine      : {:.4}", lowest_inrule);
+        }
+        if highest_ood > f32::MIN {
+            eprintln!("  highest OOD top cosine         : {:.4}", highest_ood);
+        }
+        if highest_adversarial > f32::MIN {
+            eprintln!(
+                "  highest adversarial top cosine : {:.4}",
+                highest_adversarial
+            );
+        }
+        eprintln!("\nwrote {}", summary_path);
+        eprintln!("wrote {}", full_path);
+    }
 }
