@@ -59,7 +59,7 @@ The image pack ships `ambient_office_imagery` for exactly this reason: whiteboar
 
 Thresholds are not portable across embedding models or modalities.
 
-- The image pack uses `0.10`, calibrated against the bundled `multi-modal-embed-small` model, whose image-text cosines land in roughly the 0.04 to 0.17 range. The text-modality default of `0.70` would block every image rule.
+- The image pack uses `0.10`, calibrated against the bundled `multi-modal-embed-small` model, whose image-text cosines land in roughly the 0.04 to 0.17 range. Thresholds typical of text-modality packs (the bundled text pack at `config/signal/embedding/support.yaml` ships `0.72` and `0.75`) would block every image rule. There is no built-in per-rule default: each rule's `threshold` comes from its pack, and an omitted `threshold` is `0.0`, which effectively disables the floor - always set one.
 - A different embedding model, or the same model on a different content distribution, will have a different operating range. Always calibrate against your own labeled evaluation set rather than copying a threshold from an example pack.
 - `aggregation_method: max` is usually right for distinct sensitive categories: any single strong match is enough to fire. Use `mean` only when you intend the whole category to need broad support.
 
