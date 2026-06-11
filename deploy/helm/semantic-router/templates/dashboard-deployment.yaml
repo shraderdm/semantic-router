@@ -5,6 +5,23 @@
 {{- if not (has .Values.dashboard.persistence.accessMode (list "ReadWriteOnce" "ReadWriteOncePod")) }}
 {{- fail "dashboard.persistence.accessMode must be ReadWriteOnce or ReadWriteOncePod: the dashboard's SQLite auth/session store requires single-writer access. ReadWriteMany would allow concurrent writers and corrupt the database" }}
 {{- end }}
+{{- if .Values.dashboard.persistence.existingClaim }}
+{{- /* Best-effort guard for the existing-claim path: accessMode above is not used
+       when existingClaim is set, and a render cannot see a pre-existing claim's
+       real access modes. When Helm has cluster access (install/upgrade, or
+       --dry-run=server), look the claim up and fail on multi-attach modes.
+       Pure-template pipelines get an empty lookup and must enforce this
+       themselves (documented on dashboard.persistence.existingClaim in
+       values.yaml). */}}
+{{- $claim := lookup "v1" "PersistentVolumeClaim" (include "semantic-router.namespace" .) .Values.dashboard.persistence.existingClaim }}
+{{- if $claim }}
+{{- range ($claim.spec).accessModes }}
+{{- if not (has . (list "ReadWriteOnce" "ReadWriteOncePod")) }}
+{{- fail (printf "dashboard.persistence.existingClaim %q has access mode %s: the dashboard's SQLite auth/session store requires single-writer read-write access (ReadWriteOnce or ReadWriteOncePod). ReadWriteMany would allow concurrent writers and corrupt the database; ReadOnlyMany cannot be written at all" $.Values.dashboard.persistence.existingClaim .) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- if .Values.dashboard.enabled }}
 {{- $psc := .Values.dashboard.podSecurityContext | default dict }}

@@ -136,7 +136,7 @@ the locked chart dependencies.
 | dashboard.persistence.accessMode | string | `"ReadWriteOnce"` | Access mode for the dashboard-local state PVC |
 | dashboard.persistence.annotations | object | `{}` | Annotations for the dashboard-local state PVC |
 | dashboard.persistence.enabled | bool | `false` | Persist dashboard-local SQLite state for auth/session/workflow data. This is restart-safe for one dashboard replica, not a shared HA session store. |
-| dashboard.persistence.existingClaim | string | `""` | Existing PVC to mount for dashboard-local state |
+| dashboard.persistence.existingClaim | string | `""` | Existing PVC to mount for dashboard-local state. The claim must be ReadWriteOnce or ReadWriteOncePod: the SQLite store requires single-writer read-write access (ReadWriteMany risks concurrent-writer corruption; ReadOnlyMany cannot be written at all). A render cannot inspect a pre-existing claim, so the chart validates this via lookup only when Helm has cluster access (install/upgrade, or --dry-run=server); pure-template pipelines must enforce it themselves. |
 | dashboard.persistence.mountPath | string | `"/app/data"` | Container mount path for dashboard-local state |
 | dashboard.persistence.size | string | `"1Gi"` | Requested dashboard-local state size |
 | dashboard.persistence.storageClassName | string | `""` | Storage class name. Leave empty for the cluster default; use "-" to render storageClassName: "". |
