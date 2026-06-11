@@ -71,7 +71,7 @@ docker run --rm --entrypoint /bin/sh "${ENVOY_IMAGE}" -c "
 docker run --rm --entrypoint /bin/sh "${DASHBOARD_IMAGE}" -c "
     echo '  Checking dashboard backend...'
     /usr/local/bin/dashboard-backend -help >/dev/null && echo '    ✓ dashboard backend present'
-    echo '  Checking auth bootstrap endpoint...'
+    echo '  Checking auth bootstrap endpoint (gated by default)...'
     mkdir -p /tmp/static /tmp/data
     printf '<!doctype html><title>ok</title>' > /tmp/static/index.html
     printf 'version: v0.3\nlisteners:\n  - name: http\n    address: 0.0.0.0\n    port: 8899\n' > /tmp/config.yaml
@@ -81,7 +81,17 @@ docker run --rm --entrypoint /bin/sh "${DASHBOARD_IMAGE}" -c "
         if curl -fsS http://127.0.0.1:8700/api/auth/bootstrap/can-register >/tmp/auth.json 2>/dev/null; then break; fi
         sleep 1
     done
-    grep -q '\"canRegister\":true' /tmp/auth.json && echo '    ✓ auth bootstrap endpoint ok' || { cat /tmp/dashboard.log; exit 1; }
+    grep -q '\"canRegister\":false' /tmp/auth.json && echo '    ✓ open bootstrap gated by default' || { cat /tmp/dashboard.log; exit 1; }
+    kill \$pid >/dev/null 2>&1 || true
+    wait \$pid >/dev/null 2>&1 || true
+    echo '  Checking auth bootstrap endpoint (opt-in enabled)...'
+    DASHBOARD_ALLOW_OPEN_BOOTSTRAP=true /usr/local/bin/dashboard-backend -port=8701 -static=/tmp/static -config=/tmp/config.yaml -auth-db /tmp/data/auth-optin.db -auth-jwt-secret test-secret >/tmp/dashboard-optin.log 2>&1 &
+    pid=\$!
+    for i in 1 2 3 4 5; do
+        if curl -fsS http://127.0.0.1:8701/api/auth/bootstrap/can-register >/tmp/auth-optin.json 2>/dev/null; then break; fi
+        sleep 1
+    done
+    grep -q '\"canRegister\":true' /tmp/auth-optin.json && echo '    ✓ open bootstrap opt-in ok' || { cat /tmp/dashboard-optin.log; exit 1; }
     kill \$pid >/dev/null 2>&1 || true
     wait \$pid >/dev/null 2>&1 || true
     echo '  Checking Docker CLI...'
