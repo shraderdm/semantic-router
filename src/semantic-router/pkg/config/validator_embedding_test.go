@@ -271,8 +271,11 @@ func TestValidateEmbeddingRuleNames_RejectsEmptyName(t *testing.T) {
 	}
 }
 
-// The uniqueness check must be reachable from the shared family validator so
-// both the file-config path and the K8s reconcile path enforce it.
+// The uniqueness check must be reachable from the shared family validator.
+// On the file-config path it is the only duplicate-name rejection; on the
+// Kubernetes reconcile path validatePoolRoute already rejects duplicates
+// earlier, so there it is defense-in-depth (new coverage: whitespace-only
+// names).
 func TestValidateEmbeddingContracts_RejectsDuplicateRuleNamesThroughTopLevelConfig(t *testing.T) {
 	cfg := &RouterConfig{
 		IntelligentRouting: IntelligentRouting{
