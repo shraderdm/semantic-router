@@ -337,7 +337,7 @@ global:
 
 ## Image Pull Errors
 
-### No matching manifest for linux/amd64 (after pinning a digest built on Apple Silicon)
+### No matching manifest for linux/amd64 (after pinning a single-arch digest)
 
 **Symptoms:** Pods on `amd64` nodes stay in `ImagePullBackOff` with an event like
 `no matching manifest for linux/amd64 in the manifest list entries`, while the
@@ -347,16 +347,28 @@ always reports that no image matches the node's `linux/amd64` platform.
 
 **Cause:** The published images (`ghcr.io/vllm-project/semantic-router/extproc`
 and `.../dashboard`) are multi-arch manifest lists covering `linux/amd64` and
-`linux/arm64`. You are most likely to hit this if you pin images by digest (a
-common supply-chain or GitOps practice) and resolved that digest on an arm64
-build host such as an Apple Silicon laptop or an arm64 CI runner; a default
-tag-based install is not affected. Resolving a floating tag such as `:latest` to
-a digest on an Apple Silicon machine (for example `docker pull` followed by
-`docker inspect` of `RepoDigests`) returns the **arm64-specific** image digest,
-not the
-manifest-list (index) digest. Pinning a deployment to that single-arch digest
-(in a raw manifest, via `kubectl set image`, or any tooling that consumes a
-`name@sha256:...` reference) leaves `amd64` nodes without a matching manifest.
+`linux/arm64`. The error means the image reference your deployment pins (in a
+raw manifest, via `kubectl set image`, or any tooling that consumes a
+`name@sha256:...` reference) points at a **single-arch (arm64) manifest**
+instead of the manifest-list (index) digest, so `amd64` nodes find no matching
+manifest. A default tag-based install is not affected. The common ways to end
+up holding a single-arch digest:
+
+- **Copying a per-platform digest from manifest-inspection output.**
+  `docker manifest inspect`, `docker buildx imagetools inspect`, and most
+  registry UIs list one digest per architecture alongside the index digest.
+  Copying the `linux/arm64` entry pins arm64-only.
+- **Pinning the digest of a single-arch build.** A `docker buildx build --push`
+  without `--platform linux/amd64,linux/arm64` from an Apple Silicon laptop or
+  an arm64 CI runner publishes an arm64-only image; its digest can never match
+  an `amd64` node.
+- **Tooling that resolves platform-specific manifests**, for example
+  `crane digest --platform linux/arm64`.
+
+Note that a plain `docker pull` followed by `docker inspect` of `RepoDigests`
+on Apple Silicon is **not** one of these paths: current Docker (verified on
+Docker Engine 29.x with the containerd image store) records the index digest
+there, even for an explicit `--platform` pull, so that digest is safe to pin.
 
 **Fixes:**
 
@@ -375,9 +387,16 @@ docker buildx imagetools inspect \
   --format '{{.Manifest.Digest}}'
 ```
 
-- Avoid deriving the digest from a plain `docker pull` + `docker inspect` on
-  Apple Silicon; that yields the per-architecture digest for the host platform
-  (arm64), which is the root cause above.
+- To check a digest you already pinned, inspect it directly:
+
+```bash
+docker buildx imagetools inspect ghcr.io/vllm-project/semantic-router/extproc@sha256:<pinned>
+```
+
+  A safe pin reports a manifest-list media type (Docker `manifest.list.v2` or
+  an OCI image index) with a `Manifests:` section listing both platforms. A
+  single-arch pin reports a plain image manifest with no platform list, which
+  is the root cause above.
 
 > Note: the bundled Helm chart builds image references as `repository:tag` (from
 > `image.tag` and `dashboard.image.tag` in
