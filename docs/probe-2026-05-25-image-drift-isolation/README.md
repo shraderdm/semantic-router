@@ -3,6 +3,17 @@
 Goal: localize where the residual ~0.8% post-normalization drift between Python
 reference and candle-binding's mmes pipeline actually lives.
 
+> **Outcome note (read before the hypotheses):** the labels below describe the
+> probe as DESIGNED ("Candle-Go-pipe" = the then-current Go-side 4-tap
+> bilinear). The committed artifacts do not match those labels: PR #1943's own
+> results table states the committed `report.json` row `python_vs_candle_go`
+> (0.999902) is the full pipeline **after** the resize fix, and the passport
+> row in `corpus_report.json` is bit-identical to it (cos, max_abs, mean_abs),
+> so both committed reports measure one (post-fix) preprocessing path. No
+> committed artifact captures the pre-fix Go bilinear path, which means the
+> on-record ~0.992 figure is neither confirmed nor refuted by the data in this
+> directory. See "Measured results" at the bottom.
+
 Companion to the 2026-05-21 sister-ships AAR / session log, which named the
 investigation path verbatim:
 
@@ -55,3 +66,30 @@ reference run).
 1. **Preprocessing is the entire residual drift.** Predicted result: Python vs Candle-PIL cosine ~0.999, Candle-PIL vs Candle-Go cosine ~0.992. **If this lands, the fix is to replace Go bilinear with a PIL-bicubic-antialias-equivalent resize.**
 2. Model-forward drift contributes meaningfully. Predicted result: Python vs Candle-PIL cosine 0.995-0.998. Would point at attention scale order, gelu_erf vs gelu_pytorch_tanh, or layer-norm eps.
 3. Both contribute roughly equally. Mixed signal; further bisect required.
+
+## Measured results (post-experiment, from the committed reports)
+
+What the committed artifacts actually contain, with attribution per PR #1943's
+results table ("Full pipeline after the fix"):
+
+| Pair (report.json) | Cosine | Per #1943's table |
+|------|--------|----------|
+| Python vs Candle-PIL-pipe | 0.999989 | model-forward only, same preprocessing both sides |
+| Candle-PIL vs Candle-Go | 0.999916 | preprocessing delta, post-fix Rust path |
+| Python vs Candle-Go-pipe | 0.999902 | full pipeline after the fix |
+
+`corpus_report.json` (20 fixtures, post-fix path): cosine mean 0.99992, median
+0.99995, min 0.99956, max 0.99998 vs the Python reference.
+
+Two record corrections that follow from this:
+
+1. The passport row in `corpus_report.json` is bit-identical to
+   `report.json`'s `python_vs_candle_go` row, confirming both committed
+   reports ran one preprocessing path. The pre-experiment labels in this
+   README (Candle-Go = old bilinear) describe the design, not the committed
+   data.
+2. No committed measurement of the pre-fix Go bilinear path exists, here or
+   elsewhere in the repo. The ~0.8% (cosine ~0.992) figure that motivated this
+   probe rests on the historical record only; the hypotheses above were never
+   settled by committed data, and any claim that the probe measured the prior
+   path is wrong.

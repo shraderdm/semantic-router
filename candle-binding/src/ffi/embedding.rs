@@ -2472,9 +2472,12 @@ fn decode_resize_to_chw_f32(
 /// preprocessing happens in Rust via `decode_resize_to_chw_f32`, which
 /// approximates PIL's `Image.BICUBIC` + `antialias=True` behavior used by
 /// `SiglipProcessor`. Validated end-to-end against the PyTorch reference in
-/// `docs/probe-2026-05-25-image-drift-isolation/`: cosine >= 0.999 across a
-/// 20-image corpus; the prior Go-side 4-tap bilinear path averaged cosine
-/// 0.99 on the same fixtures.
+/// `docs/probe-2026-05-25-image-drift-isolation/`: the committed artifacts
+/// measure this (post-fix) pipeline at cosine >= 0.999 across a 20-image
+/// corpus (mean 0.99992, min 0.99956; single-image bisect 0.999902). No
+/// committed artifact measures the prior Go-side 4-tap bilinear path, so the
+/// ~0.8% pre-fix drift figure that motivated the rewrite rests on the
+/// historical record, not on data in the probe directory.
 ///
 /// See `decode_resize_to_chw_f32` for the resize-filter discussion, known
 /// limitations (RGBA alpha discard, no EXIF auto-apply), and rationale.

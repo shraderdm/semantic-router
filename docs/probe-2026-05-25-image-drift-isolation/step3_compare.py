@@ -8,7 +8,10 @@ reports cosine similarities, L2 norms, and max abs diffs.
 Decision logic:
   - cos(Python, Candle-PIL-pipe)   = model-forward drift only (same preproc)
   - cos(Candle-PIL, Candle-Go-pipe) = preprocessing drift only (same Rust forward)
-  - cos(Python, Candle-Go-pipe)    = full pipeline drift (the on-record 0.992)
+  - cos(Python, Candle-Go-pipe)    = full pipeline drift (the committed
+    report.json measured the post-fix pipeline here at 0.999902; the
+    pre-fix ~0.992 on record was never captured in committed artifacts -
+    see the README outcome note)
 """
 
 import json
