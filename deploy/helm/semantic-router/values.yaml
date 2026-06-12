@@ -540,9 +540,14 @@ dashboard:
   # every pod start, which invalidates all login sessions on each restart (rolling
   # update, chart bump, or node move forces a re-login). A zero-config install
   # still works (the random fallback is a valid signing key, you can log in and
-  # use the dashboard); you just lose existing sessions whenever the pod
-  # restarts, so leaving it unset is fine for demos but set this for any
-  # deployment where sessions need to survive restarts.
+  # use the dashboard); you just lose existing sessions whenever the pod restarts.
+  # A stable signing key alone is NOT sufficient for sessions to survive a
+  # restart: the dashboard also validates every token against its session row in
+  # the SQLite store, so dashboard.persistence.enabled=true is a joint
+  # prerequisite. Without persistence the session rows are ephemeral and a
+  # restarted pod rejects otherwise-valid tokens at the session check. Leaving
+  # both unset is fine for demos; set both for any deployment where sessions
+  # need to survive restarts.
   jwtSecret:
     # -- Name of an existing Secret holding the JWT signing key. When set, the
     # dashboard reads DASHBOARD_JWT_SECRET from it via secretKeyRef. When empty,
