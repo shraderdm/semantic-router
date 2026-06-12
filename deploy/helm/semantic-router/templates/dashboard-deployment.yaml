@@ -25,11 +25,15 @@ metadata:
     app.kubernetes.io/component: dashboard
 spec:
   replicas: {{ .Values.dashboard.replicaCount }}
-  # Recreate (not RollingUpdate): the SQLite auth/session store is single-writer,
-  # so the old pod must fully terminate and release the PVC before the new pod
-  # starts. RollingUpdate would briefly run two pods writing the same database.
+  {{- if .Values.dashboard.persistence.enabled }}
+  # Recreate (not RollingUpdate): the SQLite auth/session store on the PVC is
+  # single-writer, so the old pod must fully terminate and release the claim
+  # before the new pod starts. RollingUpdate would briefly run two pods writing
+  # the same database. Without persistence each pod has its own ephemeral
+  # database, so the default RollingUpdate is safe and avoids upgrade downtime.
   strategy:
     type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       {{- include "semantic-router.selectorLabels" . | nindent 6 }}

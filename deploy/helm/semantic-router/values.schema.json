@@ -97,6 +97,25 @@
     "dashboard": {
       "type": "object",
       "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": ["enabled"]
+          },
+          "then": {
+            "properties": {
+              "replicaCount": {
+                "maximum": 1
+              }
+            }
+          }
+        }
+      ],
       "properties": {
         "enabled": {
           "type": "boolean"
@@ -106,8 +125,7 @@
         },
         "replicaCount": {
           "type": "integer",
-          "minimum": 0,
-          "maximum": 1
+          "minimum": 0
         },
         "persistence": {
           "type": "object",
