@@ -244,7 +244,7 @@ helm-safety-validate: helm-ci-setup
 		cat "$$tmp_dir/dashboard-rc.out"; \
 		exit 1; \
 	fi; \
-	grep -Eq "replicaCount" "$$tmp_dir/dashboard-rc.out"; \
+	grep -Eq "dashboard/replicaCount.*maximum|replicaCount.*(want 1|less than or equal to 1)" "$$tmp_dir/dashboard-rc.out"; \
 	echo "Validating ephemeral dashboard upgrades without Recreate downtime..."; \
 	helm template $(HELM_RELEASE_NAME) $(HELM_CHART_PATH) \
 		--set dashboard.enabled=true \
