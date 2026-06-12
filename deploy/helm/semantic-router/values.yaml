@@ -542,12 +542,12 @@ dashboard:
   # still works (the random fallback is a valid signing key, you can log in and
   # use the dashboard); you just lose existing sessions whenever the pod restarts.
   # A stable signing key alone is NOT sufficient for sessions to survive a
-  # restart: the dashboard also validates every token against its session row in
-  # the SQLite store, so dashboard.persistence.enabled=true is a joint
-  # prerequisite. Without persistence the session rows are ephemeral and a
-  # restarted pod rejects otherwise-valid tokens at the session check. Leaving
-  # both unset is fine for demos; set both for any deployment where sessions
-  # need to survive restarts.
+  # restart: the user and session rows backing each token live in the same
+  # SQLite store, so dashboard.persistence.enabled=true is a joint
+  # prerequisite. Without persistence the entire auth/session store is
+  # ephemeral, and a restarted pod no longer recognizes the token's user or
+  # session and rejects it. Leaving both unset is fine for demos; set both for
+  # any deployment where sessions need to survive restarts.
   jwtSecret:
     # -- Name of an existing Secret holding the JWT signing key. When set, the
     # dashboard reads DASHBOARD_JWT_SECRET from it via secretKeyRef. When empty,
@@ -581,6 +581,9 @@ dashboard:
   persistence:
     # -- Persist dashboard-local SQLite state for auth/session/workflow data.
     # This is restart-safe for one dashboard replica, not a shared HA session store.
+    # Persistence alone does not keep logins alive across restarts: tokens are
+    # signed with dashboard.jwtSecret, which falls back to a random per-start
+    # key when unset, so pin both for sessions that survive restarts.
     enabled: false
     # -- Existing PVC to mount for dashboard-local state.
     existingClaim: ""
