@@ -16,7 +16,29 @@ func validateEmbeddingContracts(cfg *RouterConfig) error {
 	if err := validateMmBertModelPath(cfg.EmbeddingModels.MmBertModelPath); err != nil {
 		return err
 	}
+	if err := validateEmbeddingRuleNames(cfg.EmbeddingRules); err != nil {
+		return err
+	}
 	return validateEmbeddingRuleModalities(cfg.EmbeddingRules, cfg.EmbeddingModels.EmbeddingConfig.ModelType)
+}
+
+// validateEmbeddingRuleNames rejects empty and duplicate embedding rule names.
+// Rule names are identifiers throughout the signal path: the classifier builds
+// a by-name map (last write wins), matched signals are reported by name, and
+// decisions reference signals by name. A duplicate would silently shadow the
+// earlier rule rather than fail. Mirrors validateStructureContracts.
+func validateEmbeddingRuleNames(rules []EmbeddingRule) error {
+	seen := make(map[string]struct{}, len(rules))
+	for _, rule := range rules {
+		if strings.TrimSpace(rule.Name) == "" {
+			return fmt.Errorf("routing.signals.embeddings: name cannot be empty")
+		}
+		if _, exists := seen[rule.Name]; exists {
+			return fmt.Errorf("routing.signals.embeddings[%q]: duplicate rule name", rule.Name)
+		}
+		seen[rule.Name] = struct{}{}
+	}
+	return nil
 }
 
 // validateMmBertModelPath rejects classic BERT models in the mmbert_model_path
