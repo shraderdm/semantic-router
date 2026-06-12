@@ -229,7 +229,36 @@ helm-safety-validate: helm-ci-setup
 		cat "$$tmp_dir/gmtrouter.out"; \
 		exit 1; \
 	fi; \
-	grep -q "multi-replica router deployments cannot use local learning selector state" "$$tmp_dir/gmtrouter.out"
+	grep -q "multi-replica router deployments cannot use local learning selector state" "$$tmp_dir/gmtrouter.out"; \
+	echo "Validating dashboard replica guard is scoped to enabled dashboards..."; \
+	helm template $(HELM_RELEASE_NAME) $(HELM_CHART_PATH) \
+		--set dashboard.enabled=false \
+		--set dashboard.replicaCount=3 \
+		--namespace $(HELM_NAMESPACE) > "$$tmp_dir/dashboard-disabled-rc.yaml"; \
+	echo "Validating enabled dashboard still rejects multi-replica..."; \
+	if helm template $(HELM_RELEASE_NAME) $(HELM_CHART_PATH) \
+		--set dashboard.enabled=true \
+		--set dashboard.replicaCount=2 \
+		--namespace $(HELM_NAMESPACE) > "$$tmp_dir/dashboard-rc.out" 2>&1; then \
+		echo "Expected enabled dashboard with replicaCount=2 to fail validation"; \
+		cat "$$tmp_dir/dashboard-rc.out"; \
+		exit 1; \
+	fi; \
+	grep -Eq "replicaCount" "$$tmp_dir/dashboard-rc.out"; \
+	echo "Validating ephemeral dashboard upgrades without Recreate downtime..."; \
+	helm template $(HELM_RELEASE_NAME) $(HELM_CHART_PATH) \
+		--set dashboard.enabled=true \
+		--namespace $(HELM_NAMESPACE) > "$$tmp_dir/dashboard-ephemeral.yaml"; \
+	if grep -q "type: Recreate" "$$tmp_dir/dashboard-ephemeral.yaml"; then \
+		echo "Expected no Recreate strategy when dashboard persistence is disabled"; \
+		exit 1; \
+	fi; \
+	echo "Validating persistent dashboard keeps the Recreate strategy..."; \
+	helm template $(HELM_RELEASE_NAME) $(HELM_CHART_PATH) \
+		--set dashboard.enabled=true \
+		--set dashboard.persistence.enabled=true \
+		--namespace $(HELM_NAMESPACE) > "$$tmp_dir/dashboard-persistent.yaml"; \
+	grep -q "type: Recreate" "$$tmp_dir/dashboard-persistent.yaml"
 	@echo "$(GREEN)[SUCCESS]$(NC) Helm safety validation completed successfully"
 
 helm-install: ## Install the Helm chart
