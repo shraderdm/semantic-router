@@ -355,9 +355,10 @@ manifest. A default tag-based install is not affected. The common ways to end
 up holding a single-arch digest:
 
 - **Copying a per-platform digest from manifest-inspection output.**
-  `docker manifest inspect`, `docker buildx imagetools inspect`, and most
-  registry UIs list one digest per architecture alongside the index digest.
-  Copying the `linux/arm64` entry pins arm64-only.
+  `docker manifest inspect` prints only the per-architecture digests (the
+  index's own digest does not appear in its output at all);
+  `docker buildx imagetools inspect` and most registry UIs list them alongside
+  the index digest. Copying the `linux/arm64` entry pins arm64-only.
 - **Pinning the digest of a single-arch build.** A `docker buildx build --push`
   without `--platform linux/amd64,linux/arm64` from an Apple Silicon laptop or
   an arm64 CI runner publishes an arm64-only image; its digest can never match
