@@ -606,6 +606,11 @@ struct SigLIPVisionEncoder {
     layers: Vec<SigLIPEncoderLayer>,
     post_layernorm: LayerNorm,
     head: Option<SigLIPHead>,
+    /// Per-channel normalization tensors, shape [1, 3, 1, 1], built once at
+    /// load time from IMAGE_MEAN / IMAGE_STD so forward does not reallocate
+    /// them on every call.
+    norm_mean: Tensor,
+    norm_std: Tensor,
 }
 
 /// MultiheadAttention compatible with PyTorch's nn.MultiheadAttention combined-QKV
@@ -755,11 +760,15 @@ impl SigLIPVisionEncoder {
         }
         let post_layernorm = layer_norm(config.image_hidden_size, 1e-6, vb.pp("post_layernorm"))?;
         let head = SigLIPHead::load(vb.pp("head"), config).ok();
+        let norm_mean = Tensor::from_slice(&IMAGE_MEAN, (1, 3, 1, 1), vb.device())?;
+        let norm_std = Tensor::from_slice(&IMAGE_STD, (1, 3, 1, 1), vb.device())?;
         Ok(Self {
             patch_embedding,
             layers,
             post_layernorm,
             head,
+            norm_mean,
+            norm_std,
         })
     }
 
@@ -784,11 +793,14 @@ impl SigLIPVisionEncoder {
         // preprocessor_config.json. The Go-side image decoder produces pixels
         // in [0, 1]; apply the normalization here so activations sit in the
         // input distribution the encoder was trained on.
+        // The [1, 3, 1, 1] tensors broadcast cleanly against [B, 3, H, W].
+        // They are created once at load time; to_device/to_dtype are no-op
+        // clones when the input already matches (the common case) and only
+        // materialize a converted copy on mismatch.
         let device = pixel_values.device();
         let dtype = pixel_values.dtype();
-        // Shape [1, 3, 1, 1] broadcasts cleanly against [B, 3, H, W].
-        let mean = Tensor::from_slice(&IMAGE_MEAN, (1, 3, 1, 1), device)?.to_dtype(dtype)?;
-        let std = Tensor::from_slice(&IMAGE_STD, (1, 3, 1, 1), device)?.to_dtype(dtype)?;
+        let mean = self.norm_mean.to_device(device)?.to_dtype(dtype)?;
+        let std = self.norm_std.to_device(device)?.to_dtype(dtype)?;
         let normalized = pixel_values
             .broadcast_sub(&mean)?
             .broadcast_div(&std)?
