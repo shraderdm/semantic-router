@@ -232,3 +232,63 @@ func TestEmbeddingRule_EffectiveQueryModalityDefaultsToText(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateEmbeddingRuleNames_AcceptsDistinctNames(t *testing.T) {
+	rules := []EmbeddingRule{
+		{Name: "technical_support", Candidates: []string{"a"}},
+		{Name: "account_management", Candidates: []string{"b"}},
+	}
+	if err := validateEmbeddingRuleNames(rules); err != nil {
+		t.Errorf("distinct rule names should pass, got: %v", err)
+	}
+}
+
+// Rule names are identifiers throughout the signal path (by-name map in the
+// classifier, matched-signal reporting, decision references), so a duplicate
+// must fail at config load rather than silently shadow the earlier rule.
+func TestValidateEmbeddingRuleNames_RejectsDuplicateName(t *testing.T) {
+	rules := []EmbeddingRule{
+		{Name: "support_topics", Candidates: []string{"a"}},
+		{Name: "support_topics", Candidates: []string{"b"}},
+	}
+	err := validateEmbeddingRuleNames(rules)
+	if err == nil {
+		t.Fatal("expected error for duplicate embedding rule name, got nil")
+	}
+	for _, want := range []string{"support_topics", "duplicate"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("error should contain %q, got: %s", want, err.Error())
+		}
+	}
+}
+
+func TestValidateEmbeddingRuleNames_RejectsEmptyName(t *testing.T) {
+	for _, name := range []string{"", "   "} {
+		err := validateEmbeddingRuleNames([]EmbeddingRule{{Name: name, Candidates: []string{"a"}}})
+		if err == nil {
+			t.Errorf("expected error for empty rule name %q, got nil", name)
+		}
+	}
+}
+
+// The uniqueness check must be reachable from the shared family validator so
+// both the file-config path and the K8s reconcile path enforce it.
+func TestValidateEmbeddingContracts_RejectsDuplicateRuleNamesThroughTopLevelConfig(t *testing.T) {
+	cfg := &RouterConfig{
+		IntelligentRouting: IntelligentRouting{
+			Signals: Signals{
+				EmbeddingRules: []EmbeddingRule{
+					{Name: "support_topics", Candidates: []string{"a"}},
+					{Name: "support_topics", Candidates: []string{"b"}},
+				},
+			},
+		},
+	}
+	err := validateEmbeddingContracts(cfg)
+	if err == nil {
+		t.Fatal("expected duplicate rule name to fail through the family validator, got nil")
+	}
+	if !strings.Contains(err.Error(), "support_topics") {
+		t.Errorf("error should name the duplicated rule, got: %s", err.Error())
+	}
+}
